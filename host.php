@@ -23,13 +23,13 @@
                 if ($result) {
                     ?>
                         <p>The slate has been wiped clean.</p>
-                        <p><a href='teleprompter.etadventures.com/host'></a><p>
+                        <p><a href='/host'></a><p>
                     <?php
                 } else {
                     ?>
                         <p>Great googly moogly, it's all gone to shit</p>
                         <p>Exit out and try again.</p>
-                        <p><a href='teleprompter.etadventures.com/host'></a><p>
+                        <p><a href='/host'></a><p>
                     <?php
                 }
 
@@ -79,7 +79,7 @@
 
                     if ($result) {
                         ?>
-                            <h2>Go to teleprompter.etadventures.com to submit your answers!</h2>
+                            <h2>Go to channelzeronews.stewardgoods.com to submit your answers!</h2>
                         <?php
                     } else {
                         ?>
@@ -89,7 +89,7 @@
                     }
                 } else {
                     ?>
-                    <h2>Go to teleprompter.etadventures.com to submit your answers!</h2>
+                    <h2>Go to channelzeronews.stewardgoods.com to submit your answers!</h2>
                     <?php
                 }
 
