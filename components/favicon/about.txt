@@ -1,0 +1,6 @@
+This favicon was generated using the following font:
+
+- Font Title: Kumar One Outline
+- Font Author: Copyright (c) 2016 Indian Type Foundry (info@indiantypefoundry.com)
+- Font Source: http://fonts.gstatic.com/s/kumaroneoutline/v17/Noao6VH62pyLP0fsrZ-v18wlUEcX9zDwRQu8EGKF.ttf
+- Font License: SIL Open Font License, 1.1 (http://scripts.sil.org/OFL))

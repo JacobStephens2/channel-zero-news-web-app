@@ -1,0 +1,55 @@
+/* Carousel specific styling */
+
+.carousel {
+    background-color: var(--space-cadet);
+    height: 95vh;
+}
+
+.carousel-item {
+    height: 95vh;
+    background-color: var(--cerulean);
+    color: white;
+    border-radius: 20px;
+}
+
+.carousel-item p {
+    margin-left: auto;
+    margin-right: auto;
+    align-items: center;
+    width: 86vw;
+    font-size: 4.4rem;
+    line-height: 1.2;
+    margin-bottom: 1.3rem;
+}
+
+.carousel-item h1 {
+    font-size: 6.2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.carousel.slide {
+    border-radius: 20px;
+}
+
+#game .carousel-item-next,
+#game .carousel-item-prev,
+#game .carousel-item.active {
+    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#game button.carousel-control-prev,
+#game button.carousel-control-next {
+    width: 5%;
+    background-color: hsla(224, 40%, 22%, 0);
+}
+
+#game button.carousel-control-prev:hover,
+#game button.carousel-control-next:hover {
+    width: 5%;
+    background-color: hsla(224, 40%, 22%, 0.3);
+}

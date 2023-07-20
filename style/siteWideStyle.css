@@ -1,0 +1,168 @@
+/* General styling */
+
+/*  CSS custom properties for colors 
+    generated at https://coolors.co/222e50-007991-439a86-bcd8c1-e9d985
+*/
+:root {
+    --space-cadet: hsla(224, 40%, 22%, 1);
+    --evil-cadet: hsla(224, 40%, 15%, 1);
+    --cerulean: hsla(190, 100%, 28%, 1);
+    --zomp: hsla(166, 39%, 43%, 1);
+    --celadon: hsla(131, 26%, 79%, 1);
+    --lightflax: hsla(60, 83.33%, 88.24%, 1);
+    --flax: hsla(50, 69%, 72%, 1);
+    --darkflax: rgb(227, 205, 95);
+}
+
+html {
+    height: 95vh;
+}
+
+body.custom {
+    background-color: var(--space-cadet);
+    color: white;
+    margin: 0.8rem 0.8rem 3rem 0.8rem;
+    height: 95vh;
+}
+
+.custom button,
+.custom input[type="submit"] {
+    color: var(--space-cadet);
+    background-color: var(--flax);
+    border: none;
+    border-radius: 4px;
+    font-size: 1.2rem;
+}
+
+#submitbutton {
+    box-shadow: 0px 4px 22px 9px hsl(0deg 0% 0% / 28%);
+}
+
+button:hover,
+input[type="submit"]:hover {
+    cursor: pointer;
+    background-color: var(--darkflax);
+    transition: 0.1s;
+}
+
+input[type="submit"] {
+    display: block;
+    margin-top: 1.1rem;
+}
+
+p {
+    width: min(70ch, 90vw);
+    line-height: 1.5rem;
+}
+
+.custom h1,
+.custom h2 {
+    margin-top: 1rem;
+}
+
+.custom select {
+    display: block;
+    background-color: var(--lightflax);
+    color: var(--space-cadet);
+    font-size: 1.3rem;
+    margin-top: 1.3rem;
+    margin-bottom: 0.9rem;
+}
+
+textarea {
+    resize: none;
+    width: 100%;
+    background-color: var(--lightflax);
+    color: var(--space-cadet);
+    margin-bottom: 1rem;
+}
+
+button.user {
+    margin-left: 0.2rem;
+}
+
+.custom a {
+    color: var(--flax);
+}
+
+th {
+    padding-right: 1.7rem;
+}
+
+h2 {
+    color: var(--flax);
+}
+
+.gametext {
+    padding: 20px;
+    color: var(--evil-cadet);
+    background-color: var(--space-cadet);
+    border-color: var(--zomp);
+    border: solid;
+    border-radius: 20px;
+    box-shadow: 20px 13px 20px 2px hsl(0deg 0% 0% / 65%);
+}
+
+.gametext p {
+    color: var(--flax);
+    max-width: 100%;
+}
+
+.gametext h1 {
+    color: var(--flax);
+}
+
+#index .gametext {
+    box-shadow: 0px 4px 18px 4px hsl(0deg 0% 0% / 59%);
+}
+
+.gametext hr {
+    color: var(--flax);
+    border: 2px solid var(--flax);
+    border-radius: 2px;
+    opacity: 0.8;
+    max-width: 850px;
+}
+
+.scripttext {
+    padding: 20px;
+    color: aliceblue;
+    background-color: aliceblue;
+    border: solid;
+    border-radius: 20px;
+    box-shadow: 20px 13px 20px 2px hsl(0deg 0% 0% / 65%);
+}
+
+.scripttext p {
+    color: black
+}
+
+.scripttext h1 {
+    color: black
+}
+
+html body#index {
+    height: unset;
+    padding-bottom: 1rem;
+    background-color: var(--cerulean);
+}
+
+html body#hostpage {
+    height: unset;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 1rem;
+    background-color: var(--cerulean);
+}
+
+html body#hostpage .gametext {
+    margin-top: 30px;
+}
+
+html body#hostpage .gametext p {
+    width: min(70ch, 20vw);
+}
+
+html body#hostpage .gametext h2 {
+    max-width: 35rem;
+}
