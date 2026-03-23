@@ -76,13 +76,13 @@
                     <option value='' id='placeholder'></option>
                     <?php
                         foreach($names as $name){
-                            echo "<option value='$name'>$name</option>";
+                            echo "<option value='" . e($name) . "'>" . e($name) . "</option>";
                         }
                     ?>
                 </select>
                 <?php
                 foreach($names as $name){
-                    ?><form method="post" id="<?php echo str_replace(' ', '', $name);?>" style="display:none">
+                    ?><form method="post" id="<?php echo e(str_replace(' ', '', $name));?>" style="display:none">
                         <p id='partner'>&nbsp;</p>
                         <hr>
                         <?php
@@ -92,7 +92,7 @@
                                     foreach($promptrow as $prompt){
                                         if($i!=0){
                                             ?>
-                                            <p><?php echo $prompt?></p>
+                                            <p><?php echo e($prompt)?></p>
                                             <textarea type='text' name='response<?php echo $i;?>' id='response<?php echo $i+1;?>' rows="5" cols="34" maxlength=200></textarea>
                                             <?php
                                         }
@@ -113,22 +113,8 @@
 
             <script>
                 nameselectedyet=false;
-                var nameslist = [
-                    <?php
-                        foreach($names as $name){
-                            echo "'".$name."', ";
-                        }
-                    ?>
-                ];
-                promptidlist = [
-                    <?php
-                    foreach ($prompts_id as $prompt_id){
-                        echo "'".$prompt_id . "', ";
-                    }
-                    ?>
-                ];
-                console.log(nameslist);
-                console.log(promptidlist);
+                var nameslist = <?php echo json_encode(array_values($names)); ?>;
+                var promptidlist = <?php echo json_encode(array_values($prompts_id)); ?>;
                 let nameselect = document.querySelector("#name");
                     nameselect.addEventListener("change", function () {
                         if(nameselectedyet == false){

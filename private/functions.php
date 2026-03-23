@@ -5,6 +5,10 @@ function query($query) {
     return $database->query($query);
 }
 
+function e($string) {
+    return htmlspecialchars($string ?? '', ENT_QUOTES, 'UTF-8');
+}
+
 function prepare_and_execute($sql, $types = '', $params = []) {
     global $database;
 

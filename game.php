@@ -57,59 +57,59 @@
                     <div class="gametext">
                         <p><?php 
                         if($i==0){
-                            echo "To start us off, ". $row['partner'] . " is going to be our first presenter, with ".$row['name']." working the teleprompter.";
+                            echo "To start us off, ". e($row['partner']) . " is going to be our first presenter, with ".e($row['name'])." working the teleprompter.";
                             $i++;
                         } else {
-                            echo "Next up, we have ".$row['partner'] . " reading, with " . $row['name'] . " working the teleprompter.";
+                            echo "Next up, we have ".e($row['partner']) . " reading, with " . e($row['name']) . " working the teleprompter.";
                         }
                         ?></p>
                         <br>
-                        <p>Ready? <?php echo $row['name']; ?>, hit the right-side arrow to begin!</p>
+                        <p>Ready? <?php echo e($row['name']); ?>, hit the right-side arrow to begin!</p>
                     </div>
                 </div>
                 <div class="carousel-item">
                     <div class="scripttext">
-                        <p class="script">Good evening, everyone!  I'm <?php echo $row['partner']; ?>, and this is today's Channel 0 News.</p>       
+                        <p class="script">Good evening, everyone!  I'm <?php echo e($row['partner']); ?>, and this is today's Channel 0 News.</p>       
                     </div>
                 </div>
                 <div class="carousel-item">
                     <div class="scripttext">
-                        <p class="script"><?php echo $prompts[1]; ?><?php echo $row['response1']; ?></p>
+                        <p class="script"><?php echo e($prompts[1]); ?><?php echo e($row['response1']); ?></p>
                     </div>        
                 </div>
                 <div class="carousel-item">
                     <div class="scripttext">
-                        <p class="script"><?php echo $prompts[2]; ?><?php echo $row['response2']; ?></p>
+                        <p class="script"><?php echo e($prompts[2]); ?><?php echo e($row['response2']); ?></p>
                     </div>
                 </div>
                 <div class="carousel-item">
                     <div class="scripttext">
-                        <p class="script"><?php echo $prompts[3]; ?><?php echo $row['response3']; ?></p>
+                        <p class="script"><?php echo e($prompts[3]); ?><?php echo e($row['response3']); ?></p>
                     </div>        
                 </div>
                 <div class="carousel-item">
                     <div class="scripttext">
-                        <p class="script"><?php echo $prompts[4]; ?><?php echo $row['response4']; ?></p>
+                        <p class="script"><?php echo e($prompts[4]); ?><?php echo e($row['response4']); ?></p>
                     </div>        
                 </div>
                 <div class="carousel-item">
                     <div class="scripttext">
-                        <p class="script"><?php echo $prompts[5]; ?><?php echo $row['response5']; ?></p>
+                        <p class="script"><?php echo e($prompts[5]); ?><?php echo e($row['response5']); ?></p>
                     </div>        
                 </div>
                 <div class="carousel-item">
                     <div class="scripttext">
-                        <p class="script"><?php echo $prompts[6]; ?><?php echo $row['response6']; ?></p>
+                        <p class="script"><?php echo e($prompts[6]); ?><?php echo e($row['response6']); ?></p>
                     </div>        
                 </div>
                 <div class="carousel-item">
                     <div class="scripttext">
-                        <p class="script"><?php echo $prompts[7]; ?><?php echo $row['response7']; ?></p>
+                        <p class="script"><?php echo e($prompts[7]); ?><?php echo e($row['response7']); ?></p>
                     </div>        
                 </div>
                 <div class="carousel-item">
                     <div class="scripttext">
-                        <p class="script">That's all the Channel 0 News for today, folks.  This is <?php echo $row['partner']; ?> signing off, and remember: <?php echo $row['response8']; ?></p>
+                        <p class="script">That's all the Channel 0 News for today, folks.  This is <?php echo e($row['partner']); ?> signing off, and remember: <?php echo e($row['response8']); ?></p>
                     </div>        
                 </div>
                 <?php
