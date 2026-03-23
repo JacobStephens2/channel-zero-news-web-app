@@ -6,8 +6,8 @@ Created in collaboration with Eric Boerman. Most of the development was complete
 
 ## How to Play
 
-1. **Host**: Cast `channelzeronews.stewardgoods.com/host` on a screen the whole group can see. Enter the participants' names on the page.
-2. **Players**: Go to `channelzeronews.stewardgoods.com`, choose your name from the drop down, and fill out the prompts.
+1. **Host**: Cast `channelzeronews.stephens.page/host` on a screen the whole group can see. Enter the participants' names on the page.
+2. **Players**: Go to `channelzeronews.stephens.page`, choose your name from the drop down, and fill out the prompts.
 3. After all players have submitted their answers, the host clicks "Start the game!"
 4. **Game**: Page through the slides, alternating who is reading the prompts as indicated.
 

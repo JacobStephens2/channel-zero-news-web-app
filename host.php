@@ -98,7 +98,7 @@
 
                     if ($result) {
                         ?>
-                            <h2>Go to channelzeronews.stewardgoods.com to submit your answers!</h2>
+                            <h2>Go to channelzeronews.stephens.page to submit your answers!</h2>
                         <?php
                     } else {
                         ?>
@@ -108,7 +108,7 @@
                     }
                 } else {
                     ?>
-                    <h2>Go to channelzeronews.stewardgoods.com to submit your answers!</h2>
+                    <h2>Go to channelzeronews.stephens.page to submit your answers!</h2>
                     <?php
                 }
 
