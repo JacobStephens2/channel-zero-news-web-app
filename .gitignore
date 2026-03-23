@@ -1,2 +1,3 @@
 environmentVariables.php
+.env
 private/openai/vendor
