@@ -13,7 +13,30 @@
     <h1>The Channel 0 News!</h1>
     
     <?php
-        if ($_SERVER['REQUEST_METHOD']=='POST') {
+        $host_auth_required = defined('HOST_PASSWORD') && HOST_PASSWORD !== '';
+        $host_authenticated = !$host_auth_required || !empty($_SESSION['host_authenticated']);
+
+        if ($host_auth_required && !$host_authenticated && $_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['host_password'])) {
+            if (validate_csrf_token() && hash_equals(HOST_PASSWORD, $_POST['host_password'])) {
+                $_SESSION['host_authenticated'] = true;
+                $host_authenticated = true;
+            } else {
+                ?><p>Incorrect password.</p><?php
+            }
+        }
+
+        if (!$host_authenticated) {
+    ?>
+            <h2>Host Login</h2>
+            <form method="post">
+                <?php echo csrf_input(); ?>
+                <input type="password" name="host_password" placeholder="Host password">
+                <input type="submit" value="Log In">
+            </form>
+    <?php
+        } else {
+
+        if ($_SERVER['REQUEST_METHOD']==='POST') {
             if (!validate_csrf_token()) {
                 ?><p>Invalid request. Please go back and try again.</p><?php
             } elseif (isset($_POST['_method']) && $_POST['_method']=='delete'){     
@@ -178,6 +201,7 @@
         <input type="hidden" name="_method" value="delete" />
         <input type='submit' value='Delete All Responses And Names'>
     </form>
+    <?php } ?>
 </div>
 </body>
 </html>
