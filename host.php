@@ -14,7 +14,9 @@
     
     <?php
         if ($_SERVER['REQUEST_METHOD']=='POST') {
-            if (isset($_POST['_method']) && $_POST['_method']=='delete'){     
+            if (!validate_csrf_token()) {
+                ?><p>Invalid request. Please go back and try again.</p><?php
+            } elseif (isset($_POST['_method']) && $_POST['_method']=='delete'){     
                 
                 $sql = "DELETE from tblResponses where true;";
                 
@@ -34,7 +36,9 @@
                 }
 
             } else {
-                $validNames = array_values(array_filter($_POST, function($v) { return $v !== ''; }));
+                $postData = $_POST;
+                unset($postData['csrf_token']);
+                $validNames = array_values(array_filter($postData, function($v) { return $v !== ''; }));
                 shuffle($validNames);
 
                 $sql = "SELECT * FROM tblPrompts";
@@ -127,6 +131,7 @@
         } else {
             ?>
             <form method='post' id='users'>
+                <?php echo csrf_input(); ?>
                 <section id="users">
                     <div id="SwSDiv1" class="sweetSpot">
                         <input name="1" type="search" class="user">
@@ -164,10 +169,12 @@
     </form>
     
     <form method='post'>
+        <?php echo csrf_input(); ?>
         <input type='submit' value='Check Submissions'>
     </form>
     
     <form method='post'>
+        <?php echo csrf_input(); ?>
         <input type="hidden" name="_method" value="delete" />
         <input type='submit' value='Delete All Responses And Names'>
     </form>

@@ -14,6 +14,9 @@
 
     <?php // Output HTML based on request method
         if ($_SERVER['REQUEST_METHOD']=='POST') { // Save form submission
+            if (!validate_csrf_token()) {
+                ?><p>Invalid request. Please go back and try again.</p><?php
+            } else {
             $result = prepare_and_execute(
                 "UPDATE tblResponses SET partner=?, response1=?, response2=?, response3=?, response4=?, response5=?, response6=?, response7=?, response8=? WHERE name=?",
                 "ssssssssss",
@@ -29,6 +32,7 @@
                     <p>Great googly moogly, it's all gone to shit</p>
                     <p>Exit out and try again.</p>
                 <?php
+            }
             }
         } else { // Display entry form
             $sql = "SELECT name, prompts_id FROM tblResponses;";
@@ -105,6 +109,7 @@
                         <input type="hidden" name="partner" id="partnerinput">
                         <p>That's all the Channel 0 News for today, folks.  This is your anchor signing off, and remember:</p>
                         <textarea type='text' name='response8' id='response8' rows="5" cols="34" maxlength=200></textarea>
+                        <?php echo csrf_input(); ?>
                         <input type='submit' value='Submit' id='submitbutton'>
                         </form>
                     <?php
