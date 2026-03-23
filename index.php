@@ -13,7 +13,7 @@
         <h1>The Channel 0 News!</h1>
 
     <?php // Output HTML based on request method
-        if ($_SERVER['REQUEST_METHOD']=='POST') { // Save form submission
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') { // Save form submission
             if (!validate_csrf_token()) {
                 ?><p>Invalid request. Please go back and try again.</p><?php
             } else {
@@ -117,50 +117,46 @@
             ?>
 
             <script>
-                nameselectedyet=false;
-                var nameslist = <?php echo json_encode(array_values($names)); ?>;
-                var promptidlist = <?php echo json_encode(array_values($prompts_id)); ?>;
-                let nameselect = document.querySelector("#name");
+                (function() {
+                    var nameselectedyet = false;
+                    var nameslist = <?php echo json_encode(array_values($names)); ?>;
+                    var nameselect = document.querySelector("#name");
+
                     nameselect.addEventListener("change", function () {
-                        if(nameselectedyet == false){
+                        if (nameselectedyet === false) {
                             nameselectedyet = true;
-                            console.log(nameselectedyet);
-                            let submitbutton = document.querySelector("#submitbutton");
-                            submitbutton.style.display = "block";
-                            let placeholder = document.querySelector("#placeholder");
-                            placeholder.remove();
+                            document.querySelector("#submitbutton").style.display = "block";
+                            document.querySelector("#placeholder").remove();
                         }
-                        
+
                         var nameinputs = document.querySelectorAll("#nameinput");
-                        for(let i=0; i<nameinputs.length; i++){
+                        for (var i = 0; i < nameinputs.length; i++) {
                             nameinputs[i].value = nameselect.value;
                         }
                         var partnerinputs = document.querySelectorAll("#partnerinput");
-                        var partnerfields = document.querySelectorAll("#partner")
-                        for(let i=0; i<partnerinputs.length; i++){
-                            nameindex = nameslist.indexOf(nameselect.value);
-                            partnerindex=(nameindex+1)%nameslist.length;
-                            partnervalue = nameslist[partnerindex];
-                            partnerfields[i].innerText ="You're writing for "+partnervalue;
+                        var partnerfields = document.querySelectorAll("#partner");
+                        for (var i = 0; i < partnerinputs.length; i++) {
+                            var nameindex = nameslist.indexOf(nameselect.value);
+                            var partnerindex = (nameindex + 1) % nameslist.length;
+                            var partnervalue = nameslist[partnerindex];
+                            partnerfields[i].innerText = "You're writing for " + partnervalue;
                             partnerinputs[i].value = partnervalue;
                         }
-                        let partnerfield = document.querySelector("#partner");
                         var forms = document.querySelectorAll("form");
-                        for (i=0; i<forms.length; i++){
+                        for (var i = 0; i < forms.length; i++) {
                             forms[i].style = "display:none";
                         }
-                        document.querySelector("#"+nameselect.value.replace(/\s+/g, '')).style = "display:block";
+                        document.querySelector("#" + nameselect.value.replace(/\s+/g, '')).style = "display:block";
                     });
 
                     var buttons = document.querySelectorAll("form");
-                    for(let i=0; i<buttons.length; i++){
-                        buttons[i].addEventListener("submit", function(event){
+                    for (var i = 0; i < buttons.length; i++) {
+                        buttons[i].addEventListener("submit", function(event) {
                             event.preventDefault();
-                            if(true){
-                                this.submit();
-                            }
+                            this.submit();
                         });
                     }
+                })();
             </script>
             <?php
         }

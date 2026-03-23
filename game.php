@@ -8,26 +8,8 @@
 <body id="game" class="custom">
     <?php
 
-    $debug = false;
-
     require_once 'private/initialize.php';
-    $sql = "SELECT * from tblResponses;";
-    $result = query($sql);
-
-    if ($debug === true) {
-        echo "<pre>";
-        print_r($result);
-        echo "</pre>";
-    }
-
-    $names = [];
-    foreach ($result as $row) {
-        if ($debug === true) {
-            echo "<pre>";
-            print_r($row);
-            echo "</pre>";
-        }
-    }
+    $result = query("SELECT * from tblResponses;");
 
     ?>
     <div id="carouselExample" class="carousel slide">

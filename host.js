@@ -1,3 +1,4 @@
+(function() {
 var i = 2;
 function addUserInputAndButton(event) {
     // Prevent the button click from submitting the form
@@ -48,9 +49,4 @@ document
     .querySelector("button#addUser")
     .addEventListener("click", addUserInputAndButton)
     ;
-
-fetch("endpoints/getNumberOfPlayerSubmissions.php")
-    .then((response) => response.json())
-    .then((data) => {
-        console.log(data.numberOfSubmissions);
-    });
+})();
