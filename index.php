@@ -162,6 +162,7 @@
         }
     ?>
     </div>
+    <p style="position:fixed;bottom:10px;right:10px;font-size:0.75rem;opacity:0.5"><a href="/host">Host</a></p>
 </body>
 
 </html>
