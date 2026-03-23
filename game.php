@@ -44,8 +44,7 @@
         <?php
             $i=0;
             foreach($result as $row){
-                $sql = "select * from tblPrompts where id=".$row['prompts_id'];
-                $promptsquery = query($sql);
+                $promptsquery = prepare_and_execute("SELECT * FROM tblPrompts WHERE id = ?", "i", [$row['prompts_id']]);
                 $prompts = [];
                 foreach($promptsquery as $prompt){
                     foreach($prompt as $subprompt){

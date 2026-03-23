@@ -34,48 +34,40 @@
                 }
 
             } else {
-                shuffle($_POST);
+                $validNames = array_values(array_filter($_POST, function($v) { return $v !== ''; }));
+                shuffle($validNames);
 
                 $sql = "SELECT * FROM tblPrompts";
                 $result = query($sql);
-                
-                //The following code block randomizes the prompts assigned to players,
-                //selecting out of the total pool of prompts.  Duplicates appear only
-                //if the number of players exceeds the number of prompts available.
-                $promptIDsForThisGameArray = [];
+
+                // Randomize the prompts assigned to players.
+                // Duplicates appear only if players exceed available prompts.
                 $allPromptIDsArray = [];
-                for ($i=1; $i<=$result->num_rows; $i++){
+                for ($i = 1; $i <= $result->num_rows; $i++) {
                     $allPromptIDsArray[] = $i;
                 }
                 shuffle($allPromptIDsArray);
-                for ($i=1; $i<=count($_POST); $i++){
-                    $promptIDsForThisGameArray[] = $allPromptIDsArray[$i%$result->num_rows];
-                    
+
+                $promptIDsForThisGameArray = [];
+                for ($i = 0; $i < count($validNames); $i++) {
+                    $promptIDsForThisGameArray[] = $allPromptIDsArray[$i % $result->num_rows];
                 }
                 shuffle($promptIDsForThisGameArray);
 
-                if (count($_POST) > 0) {
-                    $sql = "INSERT INTO tblResponses (
-                            name, prompts_id
-                        ) VALUES ";
-                        
-                        $i = 1;
-
-                        foreach ($_POST as $name) {
-
-                            if ($name != '') {
-                                if ($i != 1) {
-                                    $sql .= ",";
-                                }
-
-                                $sql .= " ('".sanitize($name)."'";
-                                $i++; 
-                            }
-                            $sql.= ", ".$promptIDsForThisGameArray[$i-2].")";
-                            
-                        }
-                    $sql .= ";";
-                    $result = query($sql);
+                if (count($validNames) > 0) {
+                    $placeholders = implode(', ', array_fill(0, count($validNames), '(?, ?)'));
+                    $types = '';
+                    $params = [];
+                    for ($i = 0; $i < count($validNames); $i++) {
+                        $types .= 'si';
+                        $params[] = $validNames[$i];
+                        $params[] = $promptIDsForThisGameArray[$i];
+                    }
+                    $result = prepare_and_execute(
+                        "INSERT INTO tblResponses (name, prompts_id) VALUES " . $placeholders,
+                        $types,
+                        $params
+                    );
 
                     if ($result) {
                         ?>

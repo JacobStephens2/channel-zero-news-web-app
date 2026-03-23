@@ -1,23 +1,29 @@
 <?php
 
 function query($query) {
-			
-    // This function uses PHP's mysqli API for interfacing with MySQL
-
-    // MySQL update, delete, and insert queries via mysqli
-    // return bool true if successful, and bool false otherwise
-    // Select queries return a mysqli result object.
     global $database;
-
     return $database->query($query);
-    
 }
 
-function sanitize($string) {
-
+function prepare_and_execute($sql, $types = '', $params = []) {
     global $database;
 
-    return $database->real_escape_string($string);
+    $stmt = $database->prepare($sql);
+    if (!$stmt) {
+        return false;
+    }
+    if ($types !== '' && !empty($params)) {
+        $stmt->bind_param($types, ...$params);
+    }
+    if (!$stmt->execute()) {
+        return false;
+    }
+
+    $result = $stmt->get_result();
+    if ($result instanceof mysqli_result) {
+        return $result;
+    }
+    return true;
 }
         
 ?>

@@ -14,29 +14,11 @@
 
     <?php // Output HTML based on request method
         if ($_SERVER['REQUEST_METHOD']=='POST') { // Save form submission
-            $partner = sanitize($_POST['partner']);
-            $response1 = sanitize($_POST['response1']);
-            $response2 = sanitize($_POST['response2']);
-            $response3 = sanitize($_POST['response3']);
-            $response4 = sanitize($_POST['response4']);
-            $response5 = sanitize($_POST['response5']);
-            $response6 = sanitize($_POST['response6']);
-            $response7 = sanitize($_POST['response7']);
-            $response8 = sanitize($_POST['response8']);
-            $name = sanitize($_POST['name']);
-            $sql = "UPDATE tblResponses  set
-                    partner = '".$partner."', 
-                    response1 = '".$response1."', 
-                    response2 = '".$response2."', 
-                    response3 = '".$response3."', 
-                    response4 = '".$response4."', 
-                    response5 = '".$response5."', 
-                    response6 = '".$response6."', 
-                    response7 = '".$response7."', 
-                    response8 = '".$response8."' 
-                    WHERE name= '".$name."';
-            ";
-            $result = query($sql);
+            $result = prepare_and_execute(
+                "UPDATE tblResponses SET partner=?, response1=?, response2=?, response3=?, response4=?, response5=?, response6=?, response7=?, response8=? WHERE name=?",
+                "ssssssssss",
+                [$_POST['partner'], $_POST['response1'], $_POST['response2'], $_POST['response3'], $_POST['response4'], $_POST['response5'], $_POST['response6'], $_POST['response7'], $_POST['response8'], $_POST['name']]
+            );
             if($result){
                 ?>
                     <p>Great!  Now all you have to do is wait for the game to&nbsp;start.</p>
@@ -62,16 +44,18 @@
                 $namePromptPairs[$i]['prompt_id'] = $row['prompts_id'];
                 $i++;
             }
-            echo "<pre>";
-            $i = 0;
-            $sql = "SELECT * from tblPrompts where id in ('eric was here'";
-            foreach($namePromptPairs as $namePromptPair) {
-
-                $sql .= ", '".$namePromptPair['prompt_id']."'";
-                $i++;
+            $promptIds = array_values(array_unique(array_column($namePromptPairs, 'prompt_id')));
+            if (!empty($promptIds)) {
+                $placeholders = implode(',', array_fill(0, count($promptIds), '?'));
+                $types = str_repeat('i', count($promptIds));
+                $promptset = prepare_and_execute(
+                    "SELECT * FROM tblPrompts WHERE id IN ($placeholders)",
+                    $types,
+                    $promptIds
+                );
+            } else {
+                $promptset = [];
             }
-            $sql .=");";
-            $promptset = query($sql);
 
 
             function getnamefrompromptid($id, $array1, $array2){
@@ -84,7 +68,6 @@
             function getpromptfrompromptid($id, $promptrow){
                 return $promptrow['prompt'.$id];
             }
-            echo "</pre>";
 
             ?>
 
