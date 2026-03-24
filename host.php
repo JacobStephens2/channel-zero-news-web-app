@@ -207,7 +207,7 @@
                 </form>
                 <hr>
                 <?php
-            }
+            } else {
             ?>
             <form method='post' id='users'>
                 <?php echo csrf_input(); ?>
@@ -234,9 +234,10 @@
                         let element = document.querySelector("#SwSDiv"+i);
                         element.remove();
                     });
-                }   
+                }
             </script>
             <script src='host.js' defer></script>
+            <?php } ?>
             <?php
         }
     ?>
