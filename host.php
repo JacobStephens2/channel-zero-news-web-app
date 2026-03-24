@@ -265,7 +265,7 @@ if ($host_authenticated && $_SERVER['REQUEST_METHOD']==='POST' && validate_csrf_
 
     <a href="/responses"><input type='button' value='View Responses'></a>
 
-    <a href="/archive"><input type='button' value='View Archive'></a>
+    <a href="/archive"><input type='button' value='View Response Archive'></a>
 
     <a href="/prompts"><input type='button' value='Manage Prompts'></a>
 
