@@ -252,6 +252,8 @@
 
     <a href="/responses"><input type='button' value='View Responses'></a>
 
+    <a href="/prompts"><input type='button' value='Manage Prompts'></a>
+
     <a href="/game"><input type='button' value='Start the Game!'></a>
 
     <form method='post'>
