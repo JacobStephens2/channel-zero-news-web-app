@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "page.stephens.channelzeronews",
+      "sha256_cert_fingerprints": [
+        "39:6A:3F:1E:4C:27:E4:EE:CA:D4:4A:A0:3F:A4:D9:70:33:49:1C:D6:1C:E5:B5:81:E7:B8:60:28:D3:A7:07:40"
+      ]
+    }
+  }
+]

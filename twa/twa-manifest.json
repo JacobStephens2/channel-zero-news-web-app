@@ -1,0 +1,42 @@
+{
+  "packageId": "page.stephens.channelzeronews",
+  "host": "channelzeronews.stephens.page",
+  "name": "Channel Zero News",
+  "launcherName": "CZ News",
+  "display": "standalone",
+  "themeColor": "#222E50",
+  "themeColorDark": "#1a2340",
+  "navigationColor": "#222E50",
+  "navigationColorDark": "#1a2340",
+  "navigationDividerColor": "#00000000",
+  "navigationDividerColorDark": "#00000000",
+  "backgroundColor": "#222E50",
+  "enableNotifications": false,
+  "startUrl": "/",
+  "iconUrl": "https://channelzeronews.stephens.page/components/favicon/android-chrome-512x512.png",
+  "maskableIconUrl": "https://channelzeronews.stephens.page/components/favicon/android-chrome-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "android.keystore",
+    "alias": "android"
+  },
+  "appVersionCode": 1,
+  "appVersion": "1.0.0",
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://channelzeronews.stephens.page/components/favicon/site.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://channelzeronews.stephens.page/",
+  "minSdkVersion": 21,
+  "orientation": "default",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": []
+}

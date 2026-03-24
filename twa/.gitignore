@@ -1,0 +1,12 @@
+app/
+build/
+gradle/
+.gradle/
+gradlew
+gradlew.bat
+build.gradle
+settings.gradle
+gradle.properties
+*.apk
+android.keystore
+app-release-signed-aligned.apk
