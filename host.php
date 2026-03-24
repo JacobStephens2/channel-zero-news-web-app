@@ -39,10 +39,10 @@
         if ($_SERVER['REQUEST_METHOD']==='POST') {
             if (!validate_csrf_token()) {
                 ?><p>Invalid request. Please go back and try again.</p><?php
-            } elseif (isset($_POST['_method']) && $_POST['_method']=='delete'){     
-                
+            } elseif (isset($_POST['_method']) && $_POST['_method']=='delete'){
+
                 $sql = "DELETE from tblResponses where true;";
-                
+
                 $result = query($sql);
 
                 if ($result) {
@@ -57,6 +57,33 @@
                         <p><a href='/host'></a><p>
                     <?php
                 }
+
+            } elseif (isset($_POST['_method']) && $_POST['_method']=='remove_player' && isset($_POST['player_name'])) {
+                $result = prepare_and_execute(
+                    "DELETE FROM tblResponses WHERE name = ?",
+                    "s",
+                    [$_POST['player_name']]
+                );
+                header("Location: /host");
+                exit;
+
+            } elseif (isset($_POST['_method']) && $_POST['_method']=='add_player' && isset($_POST['new_player_name']) && $_POST['new_player_name'] !== '') {
+                // Pick a random prompt for the new player
+                $promptResult = query("SELECT id FROM tblPrompts");
+                $promptIds = [];
+                while ($row = $promptResult->fetch_assoc()) {
+                    $promptIds[] = $row['id'];
+                }
+                if (!empty($promptIds)) {
+                    $randomPromptId = $promptIds[array_rand($promptIds)];
+                    prepare_and_execute(
+                        "INSERT INTO tblResponses (name, prompts_id) VALUES (?, ?)",
+                        "si",
+                        [$_POST['new_player_name'], $randomPromptId]
+                    );
+                }
+                header("Location: /host");
+                exit;
 
             } else {
                 $postData = $_POST;
@@ -98,7 +125,7 @@
 
                     if ($result) {
                         ?>
-                            <h2>Go to channelzeronews.stephens.page to submit your answers!</h2>
+                            <h2>Go to zero.stephens.page to submit your answers!</h2>
                         <?php
                     } else {
                         ?>
@@ -108,7 +135,7 @@
                     }
                 } else {
                     ?>
-                    <h2>Go to channelzeronews.stephens.page to submit your answers!</h2>
+                    <h2>Go to zero.stephens.page to submit your answers!</h2>
                     <?php
                 }
 
@@ -152,6 +179,35 @@
             }
             
         } else {
+            $currentPlayers = query("SELECT name, partner FROM tblResponses");
+            if ($currentPlayers && $currentPlayers->num_rows > 0) {
+                ?>
+                <h2>Current Players</h2>
+                <ul>
+                <?php while ($row = $currentPlayers->fetch_assoc()) { ?>
+                    <li>
+                        <?php echo e($row['name']); ?>
+                        <?php if ($row['partner'] !== null) { ?>
+                            <span style="opacity:0.5">(submitted)</span>
+                        <?php } ?>
+                        <form method="post" style="display:inline">
+                            <?php echo csrf_input(); ?>
+                            <input type="hidden" name="_method" value="remove_player">
+                            <input type="hidden" name="player_name" value="<?php echo e($row['name']); ?>">
+                            <button type="submit" style="margin-left:0.5em">✕</button>
+                        </form>
+                    </li>
+                <?php } ?>
+                </ul>
+                <form method="post">
+                    <?php echo csrf_input(); ?>
+                    <input type="hidden" name="_method" value="add_player">
+                    <input type="text" name="new_player_name" placeholder="New player name">
+                    <input type="submit" value="Add Player">
+                </form>
+                <hr>
+                <?php
+            }
             ?>
             <form method='post' id='users'>
                 <?php echo csrf_input(); ?>

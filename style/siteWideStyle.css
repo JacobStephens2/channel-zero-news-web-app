@@ -103,7 +103,8 @@ h2 {
     box-shadow: 20px 13px 20px 2px hsl(0deg 0% 0% / 65%);
 }
 
-.gametext p {
+.gametext p,
+.gametext li {
     color: var(--flax);
     max-width: 100%;
 }
