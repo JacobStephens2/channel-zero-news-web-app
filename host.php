@@ -102,7 +102,8 @@ if ($host_authenticated && $_SERVER['REQUEST_METHOD']==='POST' && validate_csrf_
                 $validNames = array_values(array_filter($postData, function($v) { return $v !== ''; }));
                 shuffle($validNames);
 
-                $sql = "SELECT * FROM tblPrompts";
+                ensure_prompt_archiving_support_exists();
+                $sql = "SELECT * FROM tblPrompts WHERE archived_at IS NULL";
                 $result = query($sql);
 
                 // Randomize the prompts assigned to players.

@@ -146,13 +146,40 @@ function archive_current_responses() {
     }
 }
 
+function ensure_prompt_archiving_support_exists() {
+    $columnCheck = prepare_and_execute(
+        "SELECT 1
+         FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = ?
+           AND TABLE_NAME = 'tblPrompts'
+           AND COLUMN_NAME = 'archived_at'
+         LIMIT 1",
+        "s",
+        [DB_NAME]
+    );
+
+    if ($columnCheck === false) {
+        return false;
+    }
+
+    if ($columnCheck->num_rows > 0) {
+        return true;
+    }
+
+    return query("ALTER TABLE tblPrompts ADD COLUMN archived_at DATETIME NULL") === true;
+}
+
 function generate_prompt_assignment_ids($playerCount) {
     $playerCount = (int)$playerCount;
     if ($playerCount <= 0) {
         return [];
     }
 
-    $promptResult = query("SELECT id FROM tblPrompts ORDER BY id ASC");
+    if (!ensure_prompt_archiving_support_exists()) {
+        return false;
+    }
+
+    $promptResult = query("SELECT id FROM tblPrompts WHERE archived_at IS NULL ORDER BY id ASC");
     if (!$promptResult || $promptResult->num_rows === 0) {
         return false;
     }
