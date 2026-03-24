@@ -18,6 +18,14 @@ if ($host_authenticated && $_SERVER['REQUEST_METHOD']==='POST' && validate_csrf_
         prepare_and_execute("DELETE FROM tblResponses WHERE name = ?", "s", [$_POST['player_name']]);
         header("Location: /host");
         exit;
+    } elseif (isset($_POST['_method']) && $_POST['_method']==='delete') {
+        $result = query("DELETE FROM tblResponses WHERE true");
+        if ($result) {
+            header("Location: /host?deleted=1");
+        } else {
+            header("Location: /host?deleted=error");
+        }
+        exit;
     } elseif (isset($_POST['_method']) && $_POST['_method']==='archive_responses') {
         $archivedCount = archive_current_responses();
         if ($archivedCount === false) {
@@ -75,122 +83,6 @@ if ($host_authenticated && $_SERVER['REQUEST_METHOD']==='POST' && validate_csrf_
             <?php } ?>
     <?php
         } else {
-
-        if ($_SERVER['REQUEST_METHOD']==='POST') {
-            if (!validate_csrf_token()) {
-                ?><p>Invalid request. Please go back and try again.</p><?php
-            } elseif (isset($_POST['_method']) && $_POST['_method']=='delete'){
-
-                $sql = "DELETE from tblResponses where true;";
-
-                $result = query($sql);
-
-                if ($result) {
-                    header("Location: /host?deleted=1");
-                    exit;
-                } else {
-                    ?>
-                        <p>Great googly moogly, it's all gone to shit</p>
-                        <p>Exit out and try again.</p>
-                        <p><a href='/host'></a><p>
-                    <?php
-                }
-
-            } else {
-                $postData = $_POST;
-                unset($postData['csrf_token']);
-                $validNames = array_values(array_filter($postData, function($v) { return $v !== ''; }));
-                shuffle($validNames);
-
-                ensure_prompt_archiving_support_exists();
-                $sql = "SELECT * FROM tblPrompts WHERE archived_at IS NULL";
-                $result = query($sql);
-
-                // Randomize the prompts assigned to players.
-                // Duplicates appear only if players exceed available prompts.
-                $allPromptIDsArray = [];
-                for ($i = 1; $i <= $result->num_rows; $i++) {
-                    $allPromptIDsArray[] = $i;
-                }
-                shuffle($allPromptIDsArray);
-
-                $promptIDsForThisGameArray = [];
-                for ($i = 0; $i < count($validNames); $i++) {
-                    $promptIDsForThisGameArray[] = $allPromptIDsArray[$i % $result->num_rows];
-                }
-                shuffle($promptIDsForThisGameArray);
-
-                if (count($validNames) > 0) {
-                    $placeholders = implode(', ', array_fill(0, count($validNames), '(?, ?)'));
-                    $types = '';
-                    $params = [];
-                    for ($i = 0; $i < count($validNames); $i++) {
-                        $types .= 'si';
-                        $params[] = $validNames[$i];
-                        $params[] = $promptIDsForThisGameArray[$i];
-                    }
-                    $result = prepare_and_execute(
-                        "INSERT INTO tblResponses (name, prompts_id) VALUES " . $placeholders,
-                        $types,
-                        $params
-                    );
-
-                    if ($result) {
-                        ?>
-                            <h2>Go to zero.stephens.page to submit your answers!</h2>
-                        <?php
-                    } else {
-                        ?>
-                            <p>Great googly moogly, it's all gone to shit</p>
-                            <p>Exit out and try again.</p>
-                        <?php
-                    }
-                } else {
-                    ?>
-                    <h2>Go to zero.stephens.page to submit your answers!</h2>
-                    <?php
-                }
-
-                $numberOfNamesResult = query("SELECT * FROM tblResponses;");
-
-                ?>
-                    <p>
-                        <span id="numberofsubmissions">0</span>/<span id="numberOfNames"><?php echo $numberOfNamesResult->num_rows; ?></span> players have submitted their answers so far
-                    </p>
-                    <p id="begingame">
-                        <a href="/game">
-                            <input type="submit" value="Start the game!">
-                        </a>
-                    </p>
-                    <div id="setintervalid" style="display:none"></div>
-                    <script>
-                        numberofsubmissions = 0;
-                        function getnumberofsubmissions() {
-                            return fetch("endpoints/getNumberOfPlayerSubmissions.php")
-                            .then((response) => response.json())
-                            .then((data) => {
-
-                                document.querySelector("#numberofsubmissions").innerText = data.numberOfSubmissions;
-                                document.querySelector("#numberOfNames").innerText = data.numberOfNames;
-
-                                if (document.querySelector("#numberofsubmissions").innerText >= data.numberOfNames) {
-                                    document.querySelector("#begingame").style.display = "block";
-                                    clearInterval(document.querySelector("#setintervalid").innerText);
-                                }
-                            });
-                        }
-
-                        var refreshIntervalId = setInterval(
-                            getnumberofsubmissions,
-                            1000
-                        );
-
-                        document.querySelector("#setintervalid").innerText = refreshIntervalId;
-                    </script>
-                <?php
-            }
-
-        } else {
             if (isset($_GET['archive'])) {
                 if ($_GET['archive'] === 'error') {
                     ?>
@@ -215,7 +107,11 @@ if ($host_authenticated && $_SERVER['REQUEST_METHOD']==='POST' && validate_csrf_
                     <?php
                 }
             }
-            if (isset($_GET['deleted']) && $_GET['deleted'] === '1') {
+            if (isset($_GET['deleted']) && $_GET['deleted'] === 'error') {
+                ?>
+                <p>Deleting the slate failed. Please try again.</p>
+                <?php
+            } elseif (isset($_GET['deleted']) && $_GET['deleted'] === '1') {
                 ?>
                 <p>The slate has been wiped clean.</p>
                 <?php
@@ -250,16 +146,11 @@ if ($host_authenticated && $_SERVER['REQUEST_METHOD']==='POST' && validate_csrf_
                 <input type="text" name="new_player_name" placeholder="New player name">
                 <input type="submit" value="Add Player">
             </form>
-            <?php
-        }
-    ?>
+    <?php } ?>
 
     <hr>
 
-    <form method='post'>
-        <?php echo csrf_input(); ?>
-        <input type='submit' value='Check Submissions'>
-    </form>
+    <a href="/submissions"><input type='button' value='Check Submissions'></a>
 
     <a href="/"><input type='button' value='Player Page'></a>
 
@@ -288,7 +179,6 @@ if ($host_authenticated && $_SERVER['REQUEST_METHOD']==='POST' && validate_csrf_
         <input type="hidden" name="_method" value="delete" />
         <input type='submit' value='Delete All Responses And Names'>
     </form>
-    <?php } ?>
 </div>
 </body>
 </html>
