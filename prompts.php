@@ -34,18 +34,18 @@ if ($host_authenticated && $_SERVER['REQUEST_METHOD'] === 'POST' && validate_csr
     } elseif (isset($_POST['_method']) && $_POST['_method'] === 'edit_prompt') {
         $id = (int)$_POST['prompt_id'];
         prepare_and_execute(
-            "UPDATE tblPrompts SET prompt1=?, prompt2=?, prompt3=?, prompt4=?, prompt5=?, prompt6=?, prompt7=? WHERE id=?",
-            "sssssssi",
-            [$_POST['prompt1'], $_POST['prompt2'], $_POST['prompt3'], $_POST['prompt4'], $_POST['prompt5'], $_POST['prompt6'], $_POST['prompt7'], $id]
+            "UPDATE tblPrompts SET name=?, prompt1=?, prompt2=?, prompt3=?, prompt4=?, prompt5=?, prompt6=?, prompt7=? WHERE id=?",
+            "ssssssssi",
+            [$_POST['prompt_set_name'], $_POST['prompt1'], $_POST['prompt2'], $_POST['prompt3'], $_POST['prompt4'], $_POST['prompt5'], $_POST['prompt6'], $_POST['prompt7'], $id]
         );
         header("Location: /prompts");
         exit;
 
     } elseif (isset($_POST['_method']) && $_POST['_method'] === 'add_prompt') {
         prepare_and_execute(
-            "INSERT INTO tblPrompts (prompt1, prompt2, prompt3, prompt4, prompt5, prompt6, prompt7) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            "sssssss",
-            [$_POST['prompt1'], $_POST['prompt2'], $_POST['prompt3'], $_POST['prompt4'], $_POST['prompt5'], $_POST['prompt6'], $_POST['prompt7']]
+            "INSERT INTO tblPrompts (name, prompt1, prompt2, prompt3, prompt4, prompt5, prompt6, prompt7) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            "ssssssss",
+            [$_POST['prompt_set_name'], $_POST['prompt1'], $_POST['prompt2'], $_POST['prompt3'], $_POST['prompt4'], $_POST['prompt5'], $_POST['prompt6'], $_POST['prompt7']]
         );
         header("Location: /prompts");
         exit;
@@ -91,30 +91,35 @@ if ($host_authenticated && $_SERVER['REQUEST_METHOD'] === 'POST' && validate_csr
                 $promptNum = 0;
                 while ($row = $result->fetch_assoc()) {
                     $promptNum++;
+                    $promptSetTitle = trim((string)$row['name']) !== '' ? $row['name'] : 'Prompt Set #' . $promptNum;
                     ?>
-                    <h2>Prompt Set #<?php echo $promptNum; ?></h2>
-                    <form method="post">
-                        <?php echo csrf_input(); ?>
-                        <input type="hidden" name="_method" value="edit_prompt">
-                        <input type="hidden" name="prompt_id" value="<?php echo (int)$row['id']; ?>">
-                        <?php for ($i = 1; $i <= 7; $i++) { ?>
-                            <label>Prompt <?php echo $i; ?>:</label>
-                            <textarea name="prompt<?php echo $i; ?>" rows="3" cols="50"><?php echo e($row["prompt$i"]); ?></textarea>
-                        <?php } ?>
-                        <input type="submit" value="Save Changes">
-                    </form>
-                    <form method="post" style="display:inline">
-                        <?php echo csrf_input(); ?>
-                        <input type="hidden" name="_method" value="archive_prompt">
-                        <input type="hidden" name="prompt_id" value="<?php echo (int)$row['id']; ?>">
-                        <input type="submit" value="Archive This Prompt Set">
-                    </form>
-                    <form method="post" style="display:inline">
-                        <?php echo csrf_input(); ?>
-                        <input type="hidden" name="_method" value="delete_prompt">
-                        <input type="hidden" name="prompt_id" value="<?php echo (int)$row['id']; ?>">
-                        <input type="submit" value="Delete This Prompt Set" onclick="return confirm('Are you sure?')">
-                    </form>
+                    <details class="prompt-set">
+                        <summary><?php echo e($promptSetTitle); ?></summary>
+                        <form method="post">
+                            <?php echo csrf_input(); ?>
+                            <input type="hidden" name="_method" value="edit_prompt">
+                            <input type="hidden" name="prompt_id" value="<?php echo (int)$row['id']; ?>">
+                            <label>Prompt Set Name:</label>
+                            <input type="text" name="prompt_set_name" value="<?php echo e($row['name']); ?>" maxlength="255">
+                            <?php for ($i = 1; $i <= 7; $i++) { ?>
+                                <label>Prompt <?php echo $i; ?>:</label>
+                                <textarea name="prompt<?php echo $i; ?>" rows="3" cols="50"><?php echo e($row["prompt$i"]); ?></textarea>
+                            <?php } ?>
+                            <input type="submit" value="Save Changes">
+                        </form>
+                        <form method="post" style="display:inline">
+                            <?php echo csrf_input(); ?>
+                            <input type="hidden" name="_method" value="archive_prompt">
+                            <input type="hidden" name="prompt_id" value="<?php echo (int)$row['id']; ?>">
+                            <input type="submit" value="Archive This Prompt Set">
+                        </form>
+                        <form method="post" style="display:inline">
+                            <?php echo csrf_input(); ?>
+                            <input type="hidden" name="_method" value="delete_prompt">
+                            <input type="hidden" name="prompt_id" value="<?php echo (int)$row['id']; ?>">
+                            <input type="submit" value="Delete This Prompt Set" onclick="return confirm('Are you sure?')">
+                        </form>
+                    </details>
                     <hr>
                     <?php
                 }
@@ -128,17 +133,30 @@ if ($host_authenticated && $_SERVER['REQUEST_METHOD'] === 'POST' && validate_csr
             <h2 id="archived-prompts">Archived Prompt Sets</h2>
             <?php if ($archivedResult && $archivedResult->num_rows > 0) { ?>
                 <?php while ($row = $archivedResult->fetch_assoc()) { ?>
-                    <h3>Archived <?php echo e($row['archived_at']); ?></h3>
-                    <?php for ($i = 1; $i <= 7; $i++) { ?>
-                        <label>Prompt <?php echo $i; ?>:</label>
-                        <textarea rows="3" cols="50" readonly><?php echo e($row["prompt$i"]); ?></textarea>
-                    <?php } ?>
-                    <form method="post" style="display:inline">
-                        <?php echo csrf_input(); ?>
-                        <input type="hidden" name="_method" value="unarchive_prompt">
-                        <input type="hidden" name="prompt_id" value="<?php echo (int)$row['id']; ?>">
-                        <input type="submit" value="Unarchive This Prompt Set">
-                    </form>
+                    <?php
+                        $archivedPromptSetTitle = trim((string)$row['name']) !== '' ? $row['name'] : 'Archived Prompt Set';
+                    ?>
+                    <details class="prompt-set archived">
+                        <summary><?php echo e($archivedPromptSetTitle); ?><?php echo $row['archived_at'] ? ' (' . e($row['archived_at']) . ')' : ''; ?></summary>
+                        <form method="post">
+                            <?php echo csrf_input(); ?>
+                            <input type="hidden" name="_method" value="edit_prompt">
+                            <input type="hidden" name="prompt_id" value="<?php echo (int)$row['id']; ?>">
+                            <label>Prompt Set Name:</label>
+                            <input type="text" name="prompt_set_name" value="<?php echo e($row['name']); ?>" maxlength="255">
+                            <?php for ($i = 1; $i <= 7; $i++) { ?>
+                                <label>Prompt <?php echo $i; ?>:</label>
+                                <textarea name="prompt<?php echo $i; ?>" rows="3" cols="50"><?php echo e($row["prompt$i"]); ?></textarea>
+                            <?php } ?>
+                            <input type="submit" value="Save Changes">
+                        </form>
+                        <form method="post" style="display:inline">
+                            <?php echo csrf_input(); ?>
+                            <input type="hidden" name="_method" value="unarchive_prompt">
+                            <input type="hidden" name="prompt_id" value="<?php echo (int)$row['id']; ?>">
+                            <input type="submit" value="Unarchive This Prompt Set">
+                        </form>
+                    </details>
                     <hr>
                 <?php } ?>
             <?php } else { ?>
@@ -149,6 +167,8 @@ if ($host_authenticated && $_SERVER['REQUEST_METHOD'] === 'POST' && validate_csr
             <form method="post">
                 <?php echo csrf_input(); ?>
                 <input type="hidden" name="_method" value="add_prompt">
+                <label>Prompt Set Name:</label>
+                <input type="text" name="prompt_set_name" maxlength="255">
                 <?php for ($i = 1; $i <= 7; $i++) { ?>
                     <label>Prompt <?php echo $i; ?>:</label>
                     <textarea name="prompt<?php echo $i; ?>" rows="3" cols="50"></textarea>

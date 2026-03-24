@@ -147,7 +147,7 @@ function archive_current_responses() {
 }
 
 function ensure_prompt_archiving_support_exists() {
-    $columnCheck = prepare_and_execute(
+    $archivedAtColumnCheck = prepare_and_execute(
         "SELECT 1
          FROM information_schema.COLUMNS
          WHERE TABLE_SCHEMA = ?
@@ -158,15 +158,38 @@ function ensure_prompt_archiving_support_exists() {
         [DB_NAME]
     );
 
-    if ($columnCheck === false) {
+    if ($archivedAtColumnCheck === false) {
         return false;
     }
 
-    if ($columnCheck->num_rows > 0) {
-        return true;
+    if ($archivedAtColumnCheck->num_rows === 0) {
+        if (query("ALTER TABLE tblPrompts ADD COLUMN archived_at DATETIME NULL") !== true) {
+            return false;
+        }
     }
 
-    return query("ALTER TABLE tblPrompts ADD COLUMN archived_at DATETIME NULL") === true;
+    $nameColumnCheck = prepare_and_execute(
+        "SELECT 1
+         FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = ?
+           AND TABLE_NAME = 'tblPrompts'
+           AND COLUMN_NAME = 'name'
+         LIMIT 1",
+        "s",
+        [DB_NAME]
+    );
+
+    if ($nameColumnCheck === false) {
+        return false;
+    }
+
+    if ($nameColumnCheck->num_rows === 0) {
+        if (query("ALTER TABLE tblPrompts ADD COLUMN name VARCHAR(255) NULL AFTER id") !== true) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 function generate_prompt_assignment_ids($playerCount) {

@@ -29,6 +29,7 @@ CREATE DATABASE ChannelZeroNews;
 
 CREATE TABLE tblPrompts (
     id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NULL,
     prompt1 TEXT, prompt2 TEXT, prompt3 TEXT, prompt4 TEXT,
     prompt5 TEXT, prompt6 TEXT, prompt7 TEXT,
     archived_at DATETIME NULL
