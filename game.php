@@ -130,5 +130,47 @@
         <span class="visually-hidden">Next</span>
     </button>
 </div>
+<script>
+    (function() {
+        function initializeCarouselUrlSync() {
+            var carouselElement = document.querySelector('#carouselExample');
+            if (!carouselElement || !window.bootstrap || !window.bootstrap.Carousel) {
+                return;
+            }
+
+            var carouselItems = carouselElement.querySelectorAll('.carousel-item');
+            var maxSlideIndex = Math.max(carouselItems.length - 1, 0);
+            var params = new URLSearchParams(window.location.search);
+            var requestedSlide = parseInt(params.get('slide') || '0', 10);
+            var initialSlide = Number.isNaN(requestedSlide) ? 0 : Math.min(Math.max(requestedSlide, 0), maxSlideIndex);
+            var carousel = new bootstrap.Carousel(carouselElement, {
+                interval: false,
+                ride: false
+            });
+
+            function updateUrl(slideIndex) {
+                var nextUrl = new URL(window.location.href);
+                nextUrl.searchParams.set('slide', slideIndex);
+                window.history.replaceState({ slide: slideIndex }, '', nextUrl);
+            }
+
+            carousel.to(initialSlide);
+            updateUrl(initialSlide);
+
+            carouselElement.addEventListener('slid.bs.carousel', function(event) {
+                updateUrl(event.to);
+            });
+
+            window.addEventListener('popstate', function() {
+                var currentParams = new URLSearchParams(window.location.search);
+                var nextSlide = parseInt(currentParams.get('slide') || '0', 10);
+                nextSlide = Number.isNaN(nextSlide) ? 0 : Math.min(Math.max(nextSlide, 0), maxSlideIndex);
+                carousel.to(nextSlide);
+            });
+        }
+
+        window.addEventListener('load', initializeCarouselUrlSync);
+    })();
+</script>
 </body>
 </html>
