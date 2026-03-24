@@ -205,7 +205,6 @@
                     <input type="text" name="new_player_name" placeholder="New player name">
                     <input type="submit" value="Add Player">
                 </form>
-                <hr>
                 <?php
             } else {
             ?>
@@ -244,15 +243,15 @@
 
     <hr>
 
-    <form method='get'>
-        <input type='submit' value='Enter Names'>
-    </form>
-    
     <form method='post'>
         <?php echo csrf_input(); ?>
         <input type='submit' value='Check Submissions'>
     </form>
-    
+
+    <a href="/responses"><input type='button' value='View Responses'></a>
+
+    <a href="/game"><input type='button' value='Start the Game!'></a>
+
     <form method='post'>
         <?php echo csrf_input(); ?>
         <input type="hidden" name="_method" value="delete" />
