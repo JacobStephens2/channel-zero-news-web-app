@@ -10,6 +10,7 @@
     background-color: var(--cerulean);
     color: white;
     border-radius: 20px;
+    overflow-y: auto;
 }
 
 .carousel-item p {
@@ -17,13 +18,13 @@
     margin-right: auto;
     align-items: center;
     width: 86vw;
-    font-size: 4.4rem;
+    font-size: clamp(1.5rem, 4.4vw, 4.4rem);
     line-height: 1.2;
     margin-bottom: 1.3rem;
 }
 
 .carousel-item h1 {
-    font-size: 6.2rem;
+    font-size: clamp(2rem, 6.2vw, 6.2rem);
     display: flex;
     justify-content: center;
 }
