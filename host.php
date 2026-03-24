@@ -145,7 +145,7 @@
                     <p>
                         <span id="numberofsubmissions">0</span>/<span id="numberOfNames"><?php echo $numberOfNamesResult->num_rows; ?></span> players have submitted their answers so far
                     </p>
-                    <p id="begingame" style="display:none">
+                    <p id="begingame">
                         <a href="/game">
                             <input type="submit" value="Start the game!">
                         </a>
