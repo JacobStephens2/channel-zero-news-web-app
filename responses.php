@@ -57,6 +57,7 @@
             }
             ?>
             <a href="/host"><input type="button" value="Back to Host"></a>
+            <a href="/archive"><input type="button" value="View Archive"></a>
             <?php
         }
     ?>

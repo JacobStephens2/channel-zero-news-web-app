@@ -10,6 +10,7 @@ Created in collaboration with Eric Boerman. Most of the development was complete
 2. **Players**: Go to `channelzeronews.stephens.page`, choose your name from the drop down, and fill out the prompts.
 3. After all players have submitted their answers, the host clicks "Start the game!"
 4. **Game**: Page through the slides, alternating who is reading the prompts as indicated.
+5. After a round, the host can click `Archive Responses` to move the current responses into `/archive` so they remain viewable without being reused in the next game.
 
 ## Setup
 
@@ -39,6 +40,21 @@ CREATE TABLE tblResponses (
     partner VARCHAR(255),
     response1 TEXT, response2 TEXT, response3 TEXT, response4 TEXT,
     response5 TEXT, response6 TEXT, response7 TEXT, response8 TEXT
+);
+
+CREATE TABLE tblResponseArchive (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    archive_batch_id VARCHAR(64) NOT NULL,
+    archived_at DATETIME NOT NULL,
+    original_response_id INT NULL,
+    name VARCHAR(255),
+    prompts_id INT,
+    partner VARCHAR(255),
+    response1 TEXT, response2 TEXT, response3 TEXT, response4 TEXT,
+    response5 TEXT, response6 TEXT, response7 TEXT, response8 TEXT,
+    submitted_at DATETIME NULL,
+    prompt1 TEXT, prompt2 TEXT, prompt3 TEXT, prompt4 TEXT,
+    prompt5 TEXT, prompt6 TEXT, prompt7 TEXT
 );
 ```
 

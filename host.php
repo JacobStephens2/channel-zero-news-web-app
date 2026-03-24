@@ -1,4 +1,50 @@
-<?php require_once 'private/initialize.php'; ?>
+<?php
+require_once 'private/initialize.php';
+
+$host_auth_required = defined('HOST_PASSWORD') && HOST_PASSWORD !== '';
+$host_authenticated = !$host_auth_required || !empty($_SESSION['host_authenticated']);
+
+// Handle host login
+if ($host_auth_required && !$host_authenticated && $_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['host_password'])) {
+    if (validate_csrf_token() && hash_equals(HOST_PASSWORD, $_POST['host_password'])) {
+        $_SESSION['host_authenticated'] = true;
+        $host_authenticated = true;
+    }
+}
+
+// Handle redirecting actions before any HTML output
+if ($host_authenticated && $_SERVER['REQUEST_METHOD']==='POST' && validate_csrf_token()) {
+    if (isset($_POST['_method']) && $_POST['_method']==='remove_player' && isset($_POST['player_name'])) {
+        prepare_and_execute("DELETE FROM tblResponses WHERE name = ?", "s", [$_POST['player_name']]);
+        header("Location: /host");
+        exit;
+    } elseif (isset($_POST['_method']) && $_POST['_method']==='archive_responses') {
+        $archivedCount = archive_current_responses();
+        if ($archivedCount === false) {
+            header("Location: /host?archive=error");
+        } else {
+            header("Location: /host?archive=" . (int)$archivedCount);
+        }
+        exit;
+    } elseif (isset($_POST['_method']) && $_POST['_method']==='add_player' && isset($_POST['new_player_name']) && $_POST['new_player_name'] !== '') {
+        $promptResult = query("SELECT id FROM tblPrompts");
+        $promptIds = [];
+        while ($row = $promptResult->fetch_assoc()) {
+            $promptIds[] = $row['id'];
+        }
+        if (!empty($promptIds)) {
+            $randomPromptId = $promptIds[array_rand($promptIds)];
+            prepare_and_execute(
+                "INSERT INTO tblResponses (name, prompts_id) VALUES (?, ?)",
+                "si",
+                [$_POST['new_player_name'], $randomPromptId]
+            );
+        }
+        header("Location: /host");
+        exit;
+    }
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -11,20 +57,8 @@
 <body id="hostpage" class="custom">
 <div class="gametext">
     <h1>The Channel 0 News!</h1>
-    
+
     <?php
-        $host_auth_required = defined('HOST_PASSWORD') && HOST_PASSWORD !== '';
-        $host_authenticated = !$host_auth_required || !empty($_SESSION['host_authenticated']);
-
-        if ($host_auth_required && !$host_authenticated && $_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['host_password'])) {
-            if (validate_csrf_token() && hash_equals(HOST_PASSWORD, $_POST['host_password'])) {
-                $_SESSION['host_authenticated'] = true;
-                $host_authenticated = true;
-            } else {
-                ?><p>Incorrect password.</p><?php
-            }
-        }
-
         if (!$host_authenticated) {
     ?>
             <h2>Host Login</h2>
@@ -33,6 +67,9 @@
                 <input type="password" name="host_password" placeholder="Host password">
                 <input type="submit" value="Log In">
             </form>
+            <?php if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['host_password'])) { ?>
+                <p>Incorrect password.</p>
+            <?php } ?>
     <?php
         } else {
 
@@ -46,10 +83,8 @@
                 $result = query($sql);
 
                 if ($result) {
-                    ?>
-                        <p>The slate has been wiped clean.</p>
-                        <p><a href='/host'></a><p>
-                    <?php
+                    header("Location: /host?deleted=1");
+                    exit;
                 } else {
                     ?>
                         <p>Great googly moogly, it's all gone to shit</p>
@@ -57,33 +92,6 @@
                         <p><a href='/host'></a><p>
                     <?php
                 }
-
-            } elseif (isset($_POST['_method']) && $_POST['_method']=='remove_player' && isset($_POST['player_name'])) {
-                $result = prepare_and_execute(
-                    "DELETE FROM tblResponses WHERE name = ?",
-                    "s",
-                    [$_POST['player_name']]
-                );
-                header("Location: /host");
-                exit;
-
-            } elseif (isset($_POST['_method']) && $_POST['_method']=='add_player' && isset($_POST['new_player_name']) && $_POST['new_player_name'] !== '') {
-                // Pick a random prompt for the new player
-                $promptResult = query("SELECT id FROM tblPrompts");
-                $promptIds = [];
-                while ($row = $promptResult->fetch_assoc()) {
-                    $promptIds[] = $row['id'];
-                }
-                if (!empty($promptIds)) {
-                    $randomPromptId = $promptIds[array_rand($promptIds)];
-                    prepare_and_execute(
-                        "INSERT INTO tblResponses (name, prompts_id) VALUES (?, ?)",
-                        "si",
-                        [$_POST['new_player_name'], $randomPromptId]
-                    );
-                }
-                header("Location: /host");
-                exit;
 
             } else {
                 $postData = $_POST;
@@ -140,7 +148,7 @@
                 }
 
                 $numberOfNamesResult = query("SELECT * FROM tblResponses;");
-            
+
                 ?>
                     <p>
                         <span id="numberofsubmissions">0</span>/<span id="numberOfNames"><?php echo $numberOfNamesResult->num_rows; ?></span> players have submitted their answers so far
@@ -160,7 +168,7 @@
 
                                 document.querySelector("#numberofsubmissions").innerText = data.numberOfSubmissions;
                                 document.querySelector("#numberOfNames").innerText = data.numberOfNames;
-                                
+
                                 if (document.querySelector("#numberofsubmissions").innerText >= data.numberOfNames) {
                                     document.querySelector("#begingame").style.display = "block";
                                     clearInterval(document.querySelector("#setintervalid").innerText);
@@ -172,17 +180,35 @@
                             getnumberofsubmissions,
                             1000
                         );
-                        
+
                         document.querySelector("#setintervalid").innerText = refreshIntervalId;
                     </script>
                 <?php
             }
-            
+
         } else {
-            $currentPlayers = query("SELECT name, partner FROM tblResponses");
-            if ($currentPlayers && $currentPlayers->num_rows > 0) {
+            if (isset($_GET['archive'])) {
+                if ($_GET['archive'] === 'error') {
+                    ?>
+                    <p>Archiving failed. Please try again.</p>
+                    <?php
+                } else {
+                    $archivedCount = (int)$_GET['archive'];
+                    ?>
+                    <p><?php echo $archivedCount; ?> response<?php echo $archivedCount === 1 ? '' : 's'; ?> archived.</p>
+                    <?php
+                }
+            }
+            if (isset($_GET['deleted']) && $_GET['deleted'] === '1') {
                 ?>
-                <h2>Current Players</h2>
+                <p>The slate has been wiped clean.</p>
+                <?php
+            }
+
+            $currentPlayers = query("SELECT name, partner FROM tblResponses");
+            ?>
+            <h2>Current Players</h2>
+            <?php if ($currentPlayers && $currentPlayers->num_rows > 0) { ?>
                 <ul>
                 <?php while ($row = $currentPlayers->fetch_assoc()) { ?>
                     <li>
@@ -199,44 +225,15 @@
                     </li>
                 <?php } ?>
                 </ul>
-                <form method="post">
-                    <?php echo csrf_input(); ?>
-                    <input type="hidden" name="_method" value="add_player">
-                    <input type="text" name="new_player_name" placeholder="New player name">
-                    <input type="submit" value="Add Player">
-                </form>
-                <?php
-            } else {
-            ?>
-            <form method='post' id='users'>
-                <?php echo csrf_input(); ?>
-                <section id="users">
-                    <div id="SwSDiv1" class="sweetSpot">
-                        <input name="1" type="search" class="user">
-                        <button id="RemoveUser1" class="user" style="margin-left: 0">-</button>
-                        <ul id="userList1" class="user"></ul>
-                    </div>
-                    <div id="SwSDiv2" class="sweetSpot">
-                        <input name="2" type="search" class="user">
-                        <button id="RemoveUser2" class="user" style="margin-left: 0">-</button>
-                        <ul id="userList2" class="user"></ul>
-                    </div>
-                </section>
-                <button id="addUser">Add Another</button>
-                <input type='submit' value='Submit'>
-            </form>
-            <script>
-                for (let i = 1; i < 3; i++) {
-                    let button = document.querySelector("#RemoveUser"+i);
-                    button.addEventListener("click", function (event) {
-                        event.preventDefault();
-                        let element = document.querySelector("#SwSDiv"+i);
-                        element.remove();
-                    });
-                }
-            </script>
-            <script src='host.js' defer></script>
+            <?php } else { ?>
+                <p>No players added yet.</p>
             <?php } ?>
+            <form method="post">
+                <?php echo csrf_input(); ?>
+                <input type="hidden" name="_method" value="add_player">
+                <input type="text" name="new_player_name" placeholder="New player name">
+                <input type="submit" value="Add Player">
+            </form>
             <?php
         }
     ?>
@@ -252,9 +249,17 @@
 
     <a href="/responses"><input type='button' value='View Responses'></a>
 
+    <a href="/archive"><input type='button' value='View Archive'></a>
+
     <a href="/prompts"><input type='button' value='Manage Prompts'></a>
 
     <a href="/game"><input type='button' value='Start the Game!'></a>
+
+    <form method='post'>
+        <?php echo csrf_input(); ?>
+        <input type="hidden" name="_method" value="archive_responses" />
+        <input type='submit' value='Archive Responses'>
+    </form>
 
     <form method='post'>
         <?php echo csrf_input(); ?>
