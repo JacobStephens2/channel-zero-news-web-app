@@ -145,5 +145,89 @@ function archive_current_responses() {
         return false;
     }
 }
+
+function generate_prompt_assignment_ids($playerCount) {
+    $playerCount = (int)$playerCount;
+    if ($playerCount <= 0) {
+        return [];
+    }
+
+    $promptResult = query("SELECT id FROM tblPrompts ORDER BY id ASC");
+    if (!$promptResult || $promptResult->num_rows === 0) {
+        return false;
+    }
+
+    $promptIds = [];
+    while ($row = $promptResult->fetch_assoc()) {
+        $promptIds[] = (int)$row['id'];
+    }
+
+    shuffle($promptIds);
+
+    $assignedPromptIds = [];
+    for ($i = 0; $i < $playerCount; $i++) {
+        $assignedPromptIds[] = $promptIds[$i % count($promptIds)];
+    }
+    shuffle($assignedPromptIds);
+
+    return $assignedPromptIds;
+}
+
+function reshuffle_current_player_prompts() {
+    global $database;
+
+    $playersResult = query("SELECT id FROM tblResponses ORDER BY id ASC");
+    if (!$playersResult) {
+        return false;
+    }
+
+    $playerIds = [];
+    while ($row = $playersResult->fetch_assoc()) {
+        $playerIds[] = (int)$row['id'];
+    }
+
+    if (count($playerIds) === 0) {
+        return 0;
+    }
+
+    $assignedPromptIds = generate_prompt_assignment_ids(count($playerIds));
+    if ($assignedPromptIds === false) {
+        return false;
+    }
+
+    $database->begin_transaction();
+
+    try {
+        foreach ($playerIds as $index => $playerId) {
+            $updated = prepare_and_execute(
+                "UPDATE tblResponses
+                 SET prompts_id = ?,
+                     partner = NULL,
+                     response1 = NULL,
+                     response2 = NULL,
+                     response3 = NULL,
+                     response4 = NULL,
+                     response5 = NULL,
+                     response6 = NULL,
+                     response7 = NULL,
+                     response8 = NULL,
+                     submitted_at = NULL
+                 WHERE id = ?",
+                "ii",
+                [$assignedPromptIds[$index], $playerId]
+            );
+
+            if ($updated === false) {
+                throw new Exception('Failed to reshuffle prompts.');
+            }
+        }
+
+        $database->commit();
+        return count($playerIds);
+    } catch (Throwable $e) {
+        $database->rollback();
+        return false;
+    }
+}
         
 ?>

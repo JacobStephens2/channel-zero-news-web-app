@@ -26,18 +26,21 @@ if ($host_authenticated && $_SERVER['REQUEST_METHOD']==='POST' && validate_csrf_
             header("Location: /host?archive=" . (int)$archivedCount);
         }
         exit;
-    } elseif (isset($_POST['_method']) && $_POST['_method']==='add_player' && isset($_POST['new_player_name']) && $_POST['new_player_name'] !== '') {
-        $promptResult = query("SELECT id FROM tblPrompts");
-        $promptIds = [];
-        while ($row = $promptResult->fetch_assoc()) {
-            $promptIds[] = $row['id'];
+    } elseif (isset($_POST['_method']) && $_POST['_method']==='shuffle_prompts') {
+        $shuffledCount = reshuffle_current_player_prompts();
+        if ($shuffledCount === false) {
+            header("Location: /host?shuffle=error");
+        } else {
+            header("Location: /host?shuffle=" . (int)$shuffledCount);
         }
-        if (!empty($promptIds)) {
-            $randomPromptId = $promptIds[array_rand($promptIds)];
+        exit;
+    } elseif (isset($_POST['_method']) && $_POST['_method']==='add_player' && isset($_POST['new_player_name']) && $_POST['new_player_name'] !== '') {
+        $promptAssignments = generate_prompt_assignment_ids(1);
+        if ($promptAssignments !== false && !empty($promptAssignments)) {
             prepare_and_execute(
                 "INSERT INTO tblResponses (name, prompts_id) VALUES (?, ?)",
                 "si",
-                [$_POST['new_player_name'], $randomPromptId]
+                [$_POST['new_player_name'], $promptAssignments[0]]
             );
         }
         header("Location: /host");
@@ -199,6 +202,18 @@ if ($host_authenticated && $_SERVER['REQUEST_METHOD']==='POST' && validate_csrf_
                     <?php
                 }
             }
+            if (isset($_GET['shuffle'])) {
+                if ($_GET['shuffle'] === 'error') {
+                    ?>
+                    <p>Prompt shuffle failed. Make sure prompt sets exist, then try again.</p>
+                    <?php
+                } else {
+                    $shuffledCount = (int)$_GET['shuffle'];
+                    ?>
+                    <p>Prompt sets reshuffled for <?php echo $shuffledCount; ?> player<?php echo $shuffledCount === 1 ? '' : 's'; ?>. Existing submissions were cleared.</p>
+                    <?php
+                }
+            }
             if (isset($_GET['deleted']) && $_GET['deleted'] === '1') {
                 ?>
                 <p>The slate has been wiped clean.</p>
@@ -254,6 +269,12 @@ if ($host_authenticated && $_SERVER['REQUEST_METHOD']==='POST' && validate_csrf_
     <a href="/prompts"><input type='button' value='Manage Prompts'></a>
 
     <a href="/game"><input type='button' value='Start the Game!'></a>
+
+    <form method='post'>
+        <?php echo csrf_input(); ?>
+        <input type="hidden" name="_method" value="shuffle_prompts" />
+        <input type='submit' value='Shuffle Prompts'>
+    </form>
 
     <form method='post'>
         <?php echo csrf_input(); ?>
