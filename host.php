@@ -248,6 +248,8 @@
         <input type='submit' value='Check Submissions'>
     </form>
 
+    <a href="/"><input type='button' value='Player Page'></a>
+
     <a href="/responses"><input type='button' value='View Responses'></a>
 
     <a href="/game"><input type='button' value='Start the Game!'></a>
