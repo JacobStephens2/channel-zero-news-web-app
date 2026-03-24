@@ -18,7 +18,7 @@
                 ?><p>Invalid request. Please go back and try again.</p><?php
             } else {
             $result = prepare_and_execute(
-                "UPDATE tblResponses SET partner=?, response1=?, response2=?, response3=?, response4=?, response5=?, response6=?, response7=?, response8=? WHERE name=?",
+                "UPDATE tblResponses SET partner=?, response1=?, response2=?, response3=?, response4=?, response5=?, response6=?, response7=?, response8=?, submitted_at=NOW() WHERE name=?",
                 "ssssssssss",
                 [$_POST['partner'], $_POST['response1'], $_POST['response2'], $_POST['response3'], $_POST['response4'], $_POST['response5'], $_POST['response6'], $_POST['response7'], $_POST['response8'], $_POST['name']]
             );
