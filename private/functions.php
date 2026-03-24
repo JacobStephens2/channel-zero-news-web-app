@@ -189,6 +189,27 @@ function ensure_prompt_archiving_support_exists() {
         }
     }
 
+    $authorColumnCheck = prepare_and_execute(
+        "SELECT 1
+         FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = ?
+           AND TABLE_NAME = 'tblPrompts'
+           AND COLUMN_NAME = 'author'
+         LIMIT 1",
+        "s",
+        [DB_NAME]
+    );
+
+    if ($authorColumnCheck === false) {
+        return false;
+    }
+
+    if ($authorColumnCheck->num_rows === 0) {
+        if (query("ALTER TABLE tblPrompts ADD COLUMN author VARCHAR(255) NULL AFTER name") !== true) {
+            return false;
+        }
+    }
+
     return true;
 }
 

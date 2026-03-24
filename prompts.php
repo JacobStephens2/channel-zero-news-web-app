@@ -34,18 +34,18 @@ if ($host_authenticated && $_SERVER['REQUEST_METHOD'] === 'POST' && validate_csr
     } elseif (isset($_POST['_method']) && $_POST['_method'] === 'edit_prompt') {
         $id = (int)$_POST['prompt_id'];
         prepare_and_execute(
-            "UPDATE tblPrompts SET name=?, prompt1=?, prompt2=?, prompt3=?, prompt4=?, prompt5=?, prompt6=?, prompt7=? WHERE id=?",
-            "ssssssssi",
-            [$_POST['prompt_set_name'], $_POST['prompt1'], $_POST['prompt2'], $_POST['prompt3'], $_POST['prompt4'], $_POST['prompt5'], $_POST['prompt6'], $_POST['prompt7'], $id]
+            "UPDATE tblPrompts SET name=?, author=?, prompt1=?, prompt2=?, prompt3=?, prompt4=?, prompt5=?, prompt6=?, prompt7=? WHERE id=?",
+            "sssssssssi",
+            [$_POST['prompt_set_name'], $_POST['prompt_set_author'], $_POST['prompt1'], $_POST['prompt2'], $_POST['prompt3'], $_POST['prompt4'], $_POST['prompt5'], $_POST['prompt6'], $_POST['prompt7'], $id]
         );
         header("Location: /prompts");
         exit;
 
     } elseif (isset($_POST['_method']) && $_POST['_method'] === 'add_prompt') {
         prepare_and_execute(
-            "INSERT INTO tblPrompts (name, prompt1, prompt2, prompt3, prompt4, prompt5, prompt6, prompt7) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            "ssssssss",
-            [$_POST['prompt_set_name'], $_POST['prompt1'], $_POST['prompt2'], $_POST['prompt3'], $_POST['prompt4'], $_POST['prompt5'], $_POST['prompt6'], $_POST['prompt7']]
+            "INSERT INTO tblPrompts (name, author, prompt1, prompt2, prompt3, prompt4, prompt5, prompt6, prompt7) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "sssssssss",
+            [$_POST['prompt_set_name'], $_POST['prompt_set_author'], $_POST['prompt1'], $_POST['prompt2'], $_POST['prompt3'], $_POST['prompt4'], $_POST['prompt5'], $_POST['prompt6'], $_POST['prompt7']]
         );
         header("Location: /prompts");
         exit;
@@ -101,6 +101,8 @@ if ($host_authenticated && $_SERVER['REQUEST_METHOD'] === 'POST' && validate_csr
                             <input type="hidden" name="prompt_id" value="<?php echo (int)$row['id']; ?>">
                             <label>Prompt Set Name:</label>
                             <input type="text" name="prompt_set_name" value="<?php echo e($row['name']); ?>" maxlength="255">
+                            <label>Author:</label>
+                            <input type="text" name="prompt_set_author" value="<?php echo e($row['author']); ?>" maxlength="255">
                             <?php for ($i = 1; $i <= 7; $i++) { ?>
                                 <label>Prompt <?php echo $i; ?>:</label>
                                 <textarea name="prompt<?php echo $i; ?>" rows="3" cols="50"><?php echo e($row["prompt$i"]); ?></textarea>
@@ -144,6 +146,8 @@ if ($host_authenticated && $_SERVER['REQUEST_METHOD'] === 'POST' && validate_csr
                             <input type="hidden" name="prompt_id" value="<?php echo (int)$row['id']; ?>">
                             <label>Prompt Set Name:</label>
                             <input type="text" name="prompt_set_name" value="<?php echo e($row['name']); ?>" maxlength="255">
+                            <label>Author:</label>
+                            <input type="text" name="prompt_set_author" value="<?php echo e($row['author']); ?>" maxlength="255">
                             <?php for ($i = 1; $i <= 7; $i++) { ?>
                                 <label>Prompt <?php echo $i; ?>:</label>
                                 <textarea name="prompt<?php echo $i; ?>" rows="3" cols="50"><?php echo e($row["prompt$i"]); ?></textarea>
@@ -169,6 +173,8 @@ if ($host_authenticated && $_SERVER['REQUEST_METHOD'] === 'POST' && validate_csr
                 <input type="hidden" name="_method" value="add_prompt">
                 <label>Prompt Set Name:</label>
                 <input type="text" name="prompt_set_name" maxlength="255">
+                <label>Author:</label>
+                <input type="text" name="prompt_set_author" maxlength="255">
                 <?php for ($i = 1; $i <= 7; $i++) { ?>
                     <label>Prompt <?php echo $i; ?>:</label>
                     <textarea name="prompt<?php echo $i; ?>" rows="3" cols="50"></textarea>
